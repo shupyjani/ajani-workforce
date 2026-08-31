@@ -1,0 +1,41 @@
+{
+  "name": "@ajani/database",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js"
+    }
+  },
+  "files": [
+    "dist",
+    "migrations"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run",
+    "test:postgres": "vitest run --config vitest.postgres.config.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "npm run build && node dist/cli.js migrate",
+    "db:seed": "npm run build && node dist/cli.js seed",
+    "db:reset:preview": "npm run build && node dist/cli.js reset-preview",
+    "db:verify": "npm run build && node dist/cli.js verify"
+  },
+  "dependencies": {
+    "@ajani/contracts": "*",
+    "@electric-sql/pglite": "0.5.7",
+    "drizzle-orm": "0.45.2",
+    "postgres": "3.4.9",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "drizzle-kit": "0.31.10"
+  }
+}

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">Ajani Workforce Platform social preview</title>
+  <desc id="description">A calm editorial card using Ajani's navy, sand, teal, and gold visual language.</desc>
+
+  <rect width="1200" height="630" fill="#0b2931" />
+  <path d="M742 0h458v630H676c72-94 68-193-11-297C597 243 622 123 742 0Z" fill="#f3efe6" />
+  <path d="M809 0h391v630H746c56-91 49-188-22-291C665 253 693 130 809 0Z" fill="#fffdf8" />
+
+  <g transform="translate(72 64) scale(1.25)">
+    <rect width="64" height="64" rx="16" fill="#f3efe6" />
+    <path d="M18 43 29.6 17h5.2L46 43h-7.2l-2-5H27.4l-2.1 5H18Zm11.7-11h4.8l-2.4-6.3L29.7 32Z" fill="#0b2931" />
+    <circle cx="47" cy="17" r="5" fill="#d3a252" />
+  </g>
+
+  <text x="72" y="202" fill="#91b7ad" font-family="Aptos, Inter, system-ui, sans-serif" font-size="15" font-weight="700" letter-spacing="3.2">AN AJANI HEALTHCARE PRODUCT</text>
+  <text x="72" y="307" fill="#fffdf8" font-family="Georgia, Cambria, 'Times New Roman', serif" font-size="88" font-weight="500" letter-spacing="-3">AJANI</text>
+  <text x="76" y="348" fill="#d6e4df" font-family="Aptos, Inter, system-ui, sans-serif" font-size="24" font-weight="650" letter-spacing="4">WORKFORCE PLATFORM</text>
+
+  <line x1="72" y1="401" x2="588" y2="401" stroke="#176c65" stroke-width="2" />
+  <circle cx="126" cy="401" r="7" fill="#d3a252" />
+
+  <text x="72" y="471" fill="#fffdf8" font-family="Georgia, Cambria, 'Times New Roman', serif" font-size="39" font-weight="500">A calmer view of healthcare work.</text>
+  <text x="72" y="547" fill="#91b7ad" font-family="Aptos, Inter, system-ui, sans-serif" font-size="15" font-weight="700" letter-spacing="2.7">SYNTHETIC SCENARIOS ONLY</text>
+
+  <g transform="translate(762 90)">
+    <text x="0" y="0" fill="#176c65" font-family="Aptos, Inter, system-ui, sans-serif" font-size="13" font-weight="700" letter-spacing="2.5">ONE OPERATIONAL FOUNDATION</text>
+
+    <line x1="22" y1="68" x2="22" y2="375" stroke="#b9c8c4" stroke-width="2" />
+    <circle cx="22" cy="88" r="7" fill="#176c65" />
+    <circle cx="22" cy="214" r="7" fill="#d3a252" />
+    <circle cx="22" cy="340" r="7" fill="#176c65" />
+
+    <g transform="translate(62 42)">
+      <rect width="322" height="94" rx="18" fill="#f8f5ee" stroke="#d8ded9" />
+      <circle cx="38" cy="47" r="18" fill="#e2efea" />
+      <path d="m29 47 6 6 12-14" fill="none" stroke="#176c65" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" />
+      <rect x="76" y="27" width="128" height="8" rx="4" fill="#0b2931" />
+      <rect x="76" y="47" width="197" height="6" rx="3" fill="#b9c8c4" />
+      <rect x="76" y="64" width="145" height="6" rx="3" fill="#d8ded9" />
+    </g>
+
+    <g transform="translate(62 168)">
+      <rect width="322" height="94" rx="18" fill="#f8f5ee" stroke="#d8ded9" />
+      <circle cx="38" cy="47" r="18" fill="#f4e5c5" />
+      <path d="M38 36v14m0 9v1" fill="none" stroke="#875a13" stroke-linecap="round" stroke-width="3" />
+      <rect x="76" y="27" width="154" height="8" rx="4" fill="#0b2931" />
+      <rect x="76" y="47" width="183" height="6" rx="3" fill="#b9c8c4" />
+      <rect x="76" y="64" width="118" height="6" rx="3" fill="#d8ded9" />
+    </g>
+
+    <g transform="translate(62 294)">
+      <rect width="322" height="94" rx="18" fill="#f8f5ee" stroke="#d8ded9" />
+      <circle cx="38" cy="47" r="18" fill="#e2efea" />
+      <path d="M29 47h18M38 38v18" fill="none" stroke="#176c65" stroke-linecap="round" stroke-width="3" />
+      <rect x="76" y="27" width="136" height="8" rx="4" fill="#0b2931" />
+      <rect x="76" y="47" width="202" height="6" rx="3" fill="#b9c8c4" />
+      <rect x="76" y="64" width="160" height="6" rx="3" fill="#d8ded9" />
+    </g>
+
+    <rect x="62" y="428" width="205" height="10" rx="5" fill="#176c65" />
+    <rect x="278" y="428" width="106" height="10" rx="5" fill="#d3a252" />
+  </g>
+</svg>

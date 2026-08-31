@@ -1,0 +1,22 @@
+{
+  "name": "@ajani/api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "predev": "npm run build",
+    "dev": "concurrently --names types,server --prefix-colors yellow,green \"tsc -p tsconfig.json --watch --preserveWatchOutput\" \"node --watch dist/server.js\"",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ajani/contracts": "*",
+    "@ajani/database": "*",
+    "@fastify/cors": "11.3.0",
+    "@fastify/rate-limit": "10.3.0",
+    "fastify": "5.12.1",
+    "zod": "4.4.3"
+  }
+}
