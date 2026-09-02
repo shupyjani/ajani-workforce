@@ -1,7 +1,14 @@
+import { livenessRoute } from '@ajani/contracts'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { StrictMode } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
+import { installPreviewApiMock, previewRequestUrl } from './test/apiResponses'
+
+beforeEach(() => {
+  installPreviewApiMock()
+})
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -111,5 +118,75 @@ describe('Ajani Workforce landing page', () => {
 
     expect(screen.queryByRole('dialog', { name: /^menu$/i })).not.toBeInTheDocument()
     expect(menuButton).toHaveFocus()
+  })
+
+  it('presents the honest cold-start explanation near the preview entry actions', () => {
+    render(<App initialEntries={['/']} />)
+
+    expect(
+      screen.getByText(
+        /first data load after opening a role preview can take up to approximately one minute/i,
+      ),
+    ).toBeInTheDocument()
+  })
+})
+
+describe('Ajani Workforce landing page API wake-up', () => {
+  it('sends exactly one GET /live wake-up request against the configured API origin when the page loads', async () => {
+    installPreviewApiMock()
+    const fetchMock = vi.mocked(globalThis.fetch)
+
+    render(<App initialEntries={['/']} />)
+
+    await waitFor(() => {
+      const liveCalls = fetchMock.mock.calls.filter(
+        ([input]) => previewRequestUrl(input).pathname === livenessRoute,
+      )
+      expect(liveCalls).toHaveLength(1)
+    })
+    const liveCall = fetchMock.mock.calls.find(
+      ([input]) => previewRequestUrl(input).pathname === livenessRoute,
+    )
+    expect(liveCall?.[1]).toMatchObject({ credentials: 'omit' })
+  })
+
+  it('still renders the landing page when the wake-up endpoint is unavailable, without logging the expected failure', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation((input) => {
+      if (previewRequestUrl(input).pathname === livenessRoute) {
+        return Promise.reject(new TypeError('Failed to fetch'))
+      }
+      return Promise.reject(new TypeError('Unexpected request in this test'))
+    })
+
+    render(<App initialEntries={['/']} />)
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: /a calmer view of healthcare work/i }),
+    ).toBeInTheDocument()
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalled()
+    })
+    expect(consoleError).not.toHaveBeenCalled()
+    expect(consoleWarn).not.toHaveBeenCalled()
+  })
+
+  it('does not send a second wake-up request across React Strict Mode double-invoked effects', async () => {
+    installPreviewApiMock()
+    const fetchMock = vi.mocked(globalThis.fetch)
+
+    render(
+      <StrictMode>
+        <App initialEntries={['/']} />
+      </StrictMode>,
+    )
+
+    await waitFor(() => {
+      const liveCalls = fetchMock.mock.calls.filter(
+        ([input]) => previewRequestUrl(input).pathname === livenessRoute,
+      )
+      expect(liveCalls).toHaveLength(1)
+    })
   })
 })

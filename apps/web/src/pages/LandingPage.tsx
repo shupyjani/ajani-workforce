@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom'
 import { BrandMark } from '../components/BrandMark'
 import { Badge } from '../components/ui/Badge'
 import { Dialog } from '../components/ui/Dialog'
+import { useApiWakeUp } from '../hooks/useApiWakeUp'
 import { useRouteDocumentTitle } from '../hooks/useDocumentTitle'
 import { roleDefinitions, roleNavigation, type RoleId } from '../types/navigation'
 
@@ -163,6 +164,11 @@ function LandingHero() {
             Read the product foundation
           </Link>
         </div>
+        <p className="landing-hero__disclosure">
+          This is an interactive pre-production preview. Its API service starts
+          on demand after inactivity, so the first data load after opening a
+          role preview can take up to approximately one minute.
+        </p>
       </div>
       <ProductTableau />
     </section>
@@ -335,6 +341,7 @@ function LandingFooter() {
 
 export function LandingPage() {
   useRouteDocumentTitle()
+  useApiWakeUp()
 
   return (
     <div className="landing">
