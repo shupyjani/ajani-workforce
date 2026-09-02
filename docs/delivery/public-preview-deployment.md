@@ -40,13 +40,15 @@ Configuration lives in the root `render.yaml` as a Blueprint with one free web s
 | Region | `frankfurt` |
 | Auto-deploy trigger | `checksPass` |
 | Build context | Repository root (no `rootDir` override) |
-| Build command | `npm ci && npm run build:api` |
+| Build command | `npm ci --include=dev && npm run build:api` |
 | Start command | `npm run start:api` |
 | Health check path | `/ready` |
 | Persistent disk | None (deliberately) |
 | Database | None (deliberately — no managed PostgreSQL for this preview) |
 
 Render's current Blueprint spec renamed the language-selection key from `env` to `runtime`; `render.yaml` uses the current `runtime: node` form.
+
+**Build command and `--include=dev`.** The Render runtime and build environment both keep `NODE_ENV=production` (see the environment-variable table below) — that does not change. The application's own build compiles TypeScript: the root `postinstall` script builds `@ajani/contracts` and `@ajani/database` with `tsc`, and `npm run build:api` then does the same for `@ajani/api`. With `NODE_ENV=production` set, npm's default is to omit `devDependencies` during `npm ci`, which is exactly where this repository's TypeScript compiler and `@types/node` are declared (correctly — they are build tooling, not application runtime dependencies). Without them, the `postinstall` build fails with `error TS2688: Cannot find type definition file for 'node'`. Adding `--include=dev` explicitly overrides that default for this one install, so the TypeScript compiler and Node type definitions are present for the build; it does not add anything to, or change, the compiled application's runtime dependencies or its `NODE_ENV=production` runtime mode.
 
 **Region.** Render's supported regions are `oregon` (the default if `region` is omitted), `ohio`, `virginia`, `frankfurt`, and `singapore`; a service's region cannot be changed after creation. `render.yaml` sets `region: frankfurt` because Ajani Healthcare and the preview's principal expected audience are UK-based, and Frankfurt is the closest currently supported Render region — choosing it now avoids creating the service in the wrong region and having to recreate it later. This is a proximity choice only: it does not guarantee any particular latency or service level.
 

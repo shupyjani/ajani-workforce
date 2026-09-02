@@ -5,7 +5,7 @@ services:
     plan: free
     region: frankfurt
     autoDeployTrigger: checksPass
-    buildCommand: npm ci && npm run build:api
+    buildCommand: npm ci --include=dev && npm run build:api
     startCommand: npm run start:api
     healthCheckPath: /ready
     envVars:
