@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: ajani-workforce-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    autoDeployTrigger: checksPass
+    buildCommand: npm ci && npm run build:api
+    startCommand: npm run start:api
+    healthCheckPath: /ready
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: AJANI_DATA_MODE
+        value: pglite
+      - key: AJANI_PGLITE_DATA_DIR
+        value: /tmp/ajani-pglite

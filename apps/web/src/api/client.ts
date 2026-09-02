@@ -33,7 +33,7 @@ export class ApiRequestError extends Error {
   }
 }
 
-function apiUrl(path: string): string {
+export function apiUrl(path: string): string {
   return `${configuredApiBaseUrl}${path}`
 }
 

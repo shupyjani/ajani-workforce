@@ -20,6 +20,7 @@ function expectNoRouterFallbackWarning(calls: readonly (readonly unknown[])[]): 
 
 describe('Ajani application shell', () => {
   it('renders the public landing page at the root route instead of redirecting into a role preview', async () => {
+    installPreviewApiMock()
     const consoleWarn = vi.spyOn(console, 'warn')
     render(<App initialEntries={['/']} />)
 

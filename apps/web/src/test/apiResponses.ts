@@ -296,7 +296,7 @@ export function previewApiResponse(input: RequestInfo | URL, init?: RequestInit)
     }))
   }
 
-  if (path === '/health') {
+  if (path === '/health' || path === '/live') {
     return jsonResponse({
       requestId,
       service: 'ajani-workforce-api',
