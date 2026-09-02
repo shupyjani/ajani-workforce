@@ -17,7 +17,7 @@ Configuration lives in the root `netlify.toml`.
 | Build command | `npm run build:web` |
 | Publish directory | `apps/web/dist` |
 | Base directory | Repository root |
-| Install | Netlify's automatic `npm ci`, using `package-lock.json` at the repository root (the existing `postinstall` script builds `@ajani/contracts` and `@ajani/database` as part of that install, before `build:web` runs) |
+| Install | Netlify automatically runs `npm install` before the build command, using the root `package.json` and the committed `package-lock.json` (the existing `postinstall` script builds `@ajani/contracts` and `@ajani/database` as part of that install, before `npm run build:web` runs). The Netlify build command itself stays `npm run build:web` — it deliberately does not run a second install. |
 | Node version | Read from the repository's `.node-version` / `.nvmrc` (`24.19.0`); no separate Netlify setting needed |
 | SPA fallback | `/*` rewrites to `/index.html` with a `200` status, so direct navigation and refreshes on React Router routes resolve correctly |
 
