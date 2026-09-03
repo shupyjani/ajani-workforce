@@ -207,7 +207,7 @@ See [SECURITY.md](SECURITY.md) for the full reporting policy and preview boundar
 - [Architecture decision records](docs/decisions/)
 - [Product and UX case study](docs/product/ux-case-study.md) and [design system](docs/product/design-system.md)
 - [Hosting-neutral delivery contract](docs/delivery/hosting-contract.md) and [operational runbook](docs/operations/runbook.md)
-- [Public preview deployment preparation](docs/delivery/public-preview-deployment.md) — configuration prepared for a future Netlify (frontend) and Render (API) deployment of this preview; no deployment exists yet
+- [Public preview deployment preparation](docs/delivery/public-preview-deployment.md) — configuration prepared for a Netlify (frontend), Render (API), and Neon (database) deployment of this preview; no successful, currently-serving deployment exists yet
 - [Contributor guide](CONTRIBUTING.md)
 
 ## Licence

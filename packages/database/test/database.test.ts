@@ -27,17 +27,23 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import {
+  assertHostedPreviewResetCompatible,
   DatabaseConfigurationError,
   createDrizzlePreviewRepository,
   createInMemoryDatabase,
+  hostedPreviewResetApprovedValue,
   migrateDatabase,
   migrationsFolder,
   parseDatabaseConfig,
+  parseHostedPreviewResetConfig,
   previewIdentifiers,
+  PreviewResetNotAllowedError,
+  resetHostedSyntheticPreviewPostgres,
   resetSyntheticPreview,
   seedSyntheticPreview,
   syntheticPreviewSeedSummary,
   WorkerJourneyRuleError,
+  type DatabaseConnection,
   type PgliteDatabaseConnection,
 } from '../src/index.js'
 import * as schema from '../src/schema.js'
@@ -79,6 +85,62 @@ describe('database configuration', () => {
       databaseUrl: 'postgresql://example.invalid/ajani',
       mode: 'postgres',
     })
+  })
+})
+
+describe('hosted synthetic-preview reset configuration', () => {
+  it('is disabled by default when the setting is absent', () => {
+    expect(parseHostedPreviewResetConfig({})).toEqual({ enabled: false })
+  })
+
+  it.each(['', 'true', '1', 'yes', 'enabled', 'SYNTHETIC-PREVIEW-ONLY', ' synthetic-preview-only'])(
+    'stays disabled for any value other than the exact approved phrase: %j',
+    (value) => {
+      expect(
+        parseHostedPreviewResetConfig({ AJANI_HOSTED_PREVIEW_RESET: value }),
+      ).toEqual({ enabled: false })
+    },
+  )
+
+  it('is enabled only by its exact approved value', () => {
+    expect(
+      parseHostedPreviewResetConfig({
+        AJANI_HOSTED_PREVIEW_RESET: hostedPreviewResetApprovedValue,
+      }),
+    ).toEqual({ enabled: true })
+  })
+
+  it('accepts the setting when disabled, regardless of data mode', () => {
+    expect(() => {
+      assertHostedPreviewResetCompatible(
+        { dataDirectory: 'memory://', mode: 'pglite' },
+        { enabled: false },
+      )
+    }).not.toThrow()
+    expect(() => {
+      assertHostedPreviewResetCompatible(
+        { databaseUrl: 'postgresql://example.invalid/ajani', mode: 'postgres' },
+        { enabled: false },
+      )
+    }).not.toThrow()
+  })
+
+  it('accepts the setting when enabled together with PostgreSQL mode', () => {
+    expect(() => {
+      assertHostedPreviewResetCompatible(
+        { databaseUrl: 'postgresql://example.invalid/ajani', mode: 'postgres' },
+        { enabled: true },
+      )
+    }).not.toThrow()
+  })
+
+  it('fails closed when enabled together with an incompatible (PGlite) mode', () => {
+    expect(() => {
+      assertHostedPreviewResetCompatible(
+        { dataDirectory: 'memory://', mode: 'pglite' },
+        { enabled: true },
+      )
+    }).toThrow(DatabaseConfigurationError)
   })
 })
 
@@ -213,6 +275,26 @@ describe('migrations and synthetic seed', () => {
     expect(result[0]?.count).toBe(
       syntheticPreviewSeedSummary.workforceMembers,
     )
+  })
+
+  it('keeps the general PGlite-only reset refusable for a PostgreSQL-mode connection', async () => {
+    const notPglite: DatabaseConnection = {
+      close: () => Promise.resolve(),
+      db: {} as never,
+      mode: 'postgres',
+    }
+
+    await expect(
+      resetSyntheticPreview(notPglite, { confirmPreviewReset: true }),
+    ).rejects.toBeInstanceOf(PreviewResetNotAllowedError)
+  })
+
+  it('keeps the dedicated hosted PostgreSQL reset refusable for a PGlite-mode connection', async () => {
+    const connection = await createMigratedDatabase()
+
+    await expect(
+      resetHostedSyntheticPreviewPostgres(connection),
+    ).rejects.toBeInstanceOf(PreviewResetNotAllowedError)
   })
 })
 

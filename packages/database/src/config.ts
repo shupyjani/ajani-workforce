@@ -84,4 +84,45 @@ export function parseDatabaseConfig(
   }
 }
 
+/**
+ * The one exact value that arms the hosted synthetic-preview reset (see
+ * `resetHostedSyntheticPreviewPostgres` in seed.ts). Deliberately a specific
+ * phrase rather than a boolean-ish "true"/"1": it must read, at a glance in a
+ * provider dashboard, as authorising exactly one narrow thing, not as a
+ * generic feature toggle.
+ */
+export const hostedPreviewResetApprovedValue = 'synthetic-preview-only'
+
+export interface HostedPreviewResetConfig {
+  readonly enabled: boolean
+}
+
+/**
+ * Absent, empty, misspelled, or any value other than the exact approved
+ * string all resolve to `enabled: false` — this setting fails closed by
+ * construction rather than by validation.
+ */
+export function parseHostedPreviewResetConfig(
+  source: DatabaseEnvironmentSource = process.env,
+): HostedPreviewResetConfig {
+  return {
+    enabled: source['AJANI_HOSTED_PREVIEW_RESET'] === hostedPreviewResetApprovedValue,
+  }
+}
+
+/**
+ * Fails closed when the hosted-preview reset is armed for a mode that cannot
+ * safely run it. Call this before connecting to any database.
+ */
+export function assertHostedPreviewResetCompatible(
+  databaseConfig: DatabaseConfig,
+  hostedPreviewReset: HostedPreviewResetConfig,
+): void {
+  if (hostedPreviewReset.enabled && databaseConfig.mode !== 'postgres') {
+    throw new DatabaseConfigurationError(
+      `Invalid database configuration: AJANI_HOSTED_PREVIEW_RESET=${hostedPreviewResetApprovedValue} requires AJANI_DATA_MODE=postgres.`,
+    )
+  }
+}
+
 export { defaultPgliteDataDirectory }

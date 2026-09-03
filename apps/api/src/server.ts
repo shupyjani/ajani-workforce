@@ -1,8 +1,12 @@
 import {
+  assertHostedPreviewResetCompatible,
   checkDatabaseReadiness,
   connectDatabase,
   createDrizzlePreviewRepository,
   migrateDatabase,
+  parseDatabaseConfig,
+  parseHostedPreviewResetConfig,
+  resetHostedSyntheticPreviewPostgres,
   resetSyntheticPreview,
   seedSyntheticPreview,
   syntheticPreviewReferenceAt,
@@ -129,16 +133,36 @@ function registerProcessLifecycle(
 
 async function start(): Promise<void> {
   const config = parseEnvironment()
+  const databaseConfig = parseDatabaseConfig()
+  const hostedPreviewReset = parseHostedPreviewResetConfig()
+  // Fails closed before any database connection is opened: a hosted-preview
+  // reset armed against the wrong mode is a misconfiguration, not something
+  // to silently ignore or silently run anyway.
+  assertHostedPreviewResetCompatible(databaseConfig, hostedPreviewReset)
   let connection: DatabaseConnection | undefined
   let application: Application | undefined
 
   try {
-    const activeConnection = await connectDatabase()
+    const activeConnection = await connectDatabase(databaseConfig)
     connection = activeConnection
 
     if (activeConnection.mode === 'pglite') {
       await migrateDatabase(activeConnection)
       await seedSyntheticPreview(activeConnection)
+    } else if (hostedPreviewReset.enabled) {
+      // Every hosted cold start or restart gets a clean, deterministic public
+      // demonstration. Errors here are deliberately replaced with a fixed,
+      // credential-free message before they can reach any logger — postgres.js
+      // connection errors can otherwise carry hostnames or other connection
+      // detail in `.message`, and pino's field-name redaction (see
+      // `buildLogger` below) cannot scrub text embedded inside a message
+      // string, only whole fields named exactly like a redaction path.
+      try {
+        await migrateDatabase(activeConnection)
+        await resetHostedSyntheticPreviewPostgres(activeConnection)
+      } catch {
+        throw new Error('Hosted synthetic preview initialisation failed.')
+      }
     }
 
     // Test-only: an external E2E runner needs to restore the synthetic preview
