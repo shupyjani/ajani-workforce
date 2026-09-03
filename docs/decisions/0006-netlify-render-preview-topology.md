@@ -1,7 +1,7 @@
 # ADR 0006: Netlify static frontend and separate Render API for the initial public preview
 
 Date: 2026-09-02
-Status: accepted
+Status: accepted — its hosted-database choice (PGlite on Render) is superseded by [ADR 0007](0007-hosted-preview-neon-postgres.md); the Netlify/Render split described below is unchanged
 
 ## Context
 

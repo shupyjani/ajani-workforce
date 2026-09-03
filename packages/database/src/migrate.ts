@@ -1,5 +1,4 @@
 import { fileURLToPath } from 'node:url'
-import { migrate as migratePglite } from 'drizzle-orm/pglite/migrator'
 import { migrate as migratePostgres } from 'drizzle-orm/postgres-js/migrator'
 import type { DatabaseConnection } from './connection.js'
 
@@ -11,6 +10,9 @@ export async function migrateDatabase(
   connection: DatabaseConnection,
 ): Promise<void> {
   if (connection.mode === 'pglite') {
+    // Loaded lazily so PostgreSQL-mode startup never pulls in the PGlite
+    // migrator (see connection.ts's lazy PGlite import for the same reason).
+    const { migrate: migratePglite } = await import('drizzle-orm/pglite/migrator')
     await migratePglite(connection.db, { migrationsFolder })
     return
   }

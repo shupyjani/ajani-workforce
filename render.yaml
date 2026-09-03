@@ -16,6 +16,6 @@ services:
       - key: NODE_VERSION
         value: 24.19.0
       - key: AJANI_DATA_MODE
-        value: pglite
-      - key: AJANI_PGLITE_DATA_DIR
-        value: /tmp/ajani-pglite
+        value: postgres
+      - key: AJANI_HOSTED_PREVIEW_RESET
+        value: synthetic-preview-only

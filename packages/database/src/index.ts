@@ -1,9 +1,13 @@
 export {
+  assertHostedPreviewResetCompatible,
   DatabaseConfigurationError,
   defaultPgliteDataDirectory,
+  hostedPreviewResetApprovedValue,
   parseDatabaseConfig,
+  parseHostedPreviewResetConfig,
   type DatabaseConfig,
   type DataMode,
+  type HostedPreviewResetConfig,
 } from './config.js'
 export {
   checkDatabaseReadiness,
@@ -59,6 +63,7 @@ export {
 } from './repository-types.js'
 export {
   PreviewResetNotAllowedError,
+  resetHostedSyntheticPreviewPostgres,
   resetSyntheticPreview,
   seedSyntheticPreview,
   syntheticPreviewSeedSummary,
