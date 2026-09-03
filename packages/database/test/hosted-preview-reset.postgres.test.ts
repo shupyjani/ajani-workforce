@@ -110,27 +110,39 @@ describe('hosted synthetic-preview PostgreSQL reset', () => {
   it('relies on a transaction mechanism that rolls back completely on failure', async () => {
     // resetHostedSyntheticPreviewPostgres wraps delete-then-reseed in exactly
     // one `connection.db.transaction(...)` call. This proves that mechanism
-    // itself is all-or-nothing against this real database: a failure partway
-    // through a same-shaped transaction leaves the prior state completely
-    // intact, never a half-deleted database.
+    // itself is all-or-nothing against this real database, using the same
+    // safe first deletion the real reset performs — activityEvents scoped to
+    // the one synthetic organisation — so it never trips an unrelated
+    // foreign key (seeded timesheets reference preview workforce members)
+    // before the deliberately simulated failure is even reached.
     await resetHostedSyntheticPreviewPostgres(connection)
     const beforeCount = await connection.db
       .select({ count: count() })
-      .from(schema.workforceMembers)
+      .from(schema.activityEvents)
+      .where(eq(schema.activityEvents.organisationId, previewIdentifiers.organisation))
+    expect(beforeCount[0]?.count).toBeGreaterThan(0)
 
     await expect(
       connection.db.transaction(async (transaction) => {
         // Deletes through `transaction`, not the outer `connection.db` — a
         // delete issued on the outer handle would run on its own separate,
         // already-committed connection and defeat the point of this test.
-        await transaction.delete(schema.workforceMembers)
+        await transaction
+          .delete(schema.activityEvents)
+          .where(eq(schema.activityEvents.organisationId, previewIdentifiers.organisation))
+        const duringTransaction = await transaction
+          .select({ count: count() })
+          .from(schema.activityEvents)
+          .where(eq(schema.activityEvents.organisationId, previewIdentifiers.organisation))
+        expect(duringTransaction[0]?.count).toBe(0)
         throw new Error('Simulated mid-reset failure.')
       }),
     ).rejects.toThrow('Simulated mid-reset failure.')
 
     const afterCount = await connection.db
       .select({ count: count() })
-      .from(schema.workforceMembers)
+      .from(schema.activityEvents)
+      .where(eq(schema.activityEvents.organisationId, previewIdentifiers.organisation))
     expect(afterCount[0]?.count).toBe(beforeCount[0]?.count)
   })
 })
