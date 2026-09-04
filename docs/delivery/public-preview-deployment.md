@@ -1,4 +1,4 @@
-# Public preview deployment: Netlify frontend, Render API
+# Public preview deployment: Netlify frontend, Render API, and Neon PostgreSQL
 
 ## Scope
 
@@ -8,7 +8,29 @@ Render Free web services run with a 512 MiB memory limit. An earlier version of 
 
 This preview is not a live healthcare deployment. No real patient, workforce, or client data may be entered at any point. Ajani Healthcare is a genuine operating business; the organisations, personas, and records inside this preview are fictional and synthetic, and the application is not used for live healthcare operations.
 
-No successful, currently-serving deployment exists yet: an earlier Render build of this API reached application startup and then exceeded Render's memory limit, for the reason described above. This document prepares the corrected configuration; it does not record a completed, successfully-verified deployment or a live URL — that will only be confirmed after the connection order below is followed and the verification steps pass.
+This corrected topology was connected and verified successfully for the public preview on 2026-09-04, superseding the earlier failed attempt described above — see "Verified deployment" immediately below for the confirmed URLs and checks.
+
+## Verified deployment
+
+The topology described in this document was connected in the order set out in "Safe provider-connection order" below and verified successfully:
+
+- Verification date: 2026-09-04
+- Custom frontend: [https://workforce.ajanihealthcare.com](https://workforce.ajanihealthcare.com)
+- Netlify provider frontend: [https://ajani-workforce-preview.netlify.app](https://ajani-workforce-preview.netlify.app)
+- Render API: [https://ajani-workforce-api.onrender.com](https://ajani-workforce-api.onrender.com)
+- Database: Neon Free PostgreSQL, with no connection string recorded in this repository or any document
+- Netlify DNS confirmed for the custom subdomain
+- HTTPS enabled using the existing Let's Encrypt wildcard certificate
+- Render deployment from `main` commit `900900a` succeeded
+- `GET /live` returned `200` with status `ok`
+- `GET /ready` returned `200` with status `ready`, confirming database-backed readiness
+- `GET /health` returned `200` with status `ok`
+- Worker, Manager, and Administrator previews loaded successfully through the custom domain
+- Direct refresh/navigation on a preview route succeeded through the SPA fallback
+- The Netlify branding badge was disabled through the project setting
+- No paid upgrade was selected on any provider
+
+This is a public pre-production preview, not a live healthcare deployment, and contains synthetic preview data only — see "Scope" above.
 
 ## Netlify (frontend)
 
@@ -137,9 +159,19 @@ Because `CORS_ALLOWED_ORIGINS` is never declared in `render.yaml`, this manually
 1. Add the custom origin to the same variable as a second comma-separated value, for example: `https://<netlify-site-name>.netlify.app,https://workforce.ajanihealthcare.com` (keep the temporary Netlify origin until the custom domain is verified end-to-end, then remove it once it is no longer needed).
 2. Redeploy or restart the Render service again.
 
+**Currently verified value.** `CORS_ALLOWED_ORIGINS` on the live Render service is currently set to:
+
+```
+https://ajani-workforce-preview.netlify.app,https://workforce.ajanihealthcare.com
+```
+
+Both exact origins are currently retained — the temporary Netlify origin has not been removed — with no wildcard.
+
 No wildcard origin is ever appropriate for this API.
 
 ## Safe provider-connection order
+
+This sequence was followed successfully for the initial public deployment, completed and verified on 2026-09-04 (see "Verified deployment" above). It remains the reusable runbook for reconnecting or recreating this topology.
 
 1. Review and commit this code on its own branch (no provider is touched yet).
 2. Create a Neon Free PostgreSQL project — this can happen at any point up to step 5; it does not depend on Render or Netlify.
