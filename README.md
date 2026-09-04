@@ -2,9 +2,11 @@
 
 A pre-production healthcare-workforce platform from Ajani Healthcare, connecting Worker shift and timesheet journeys, Manager operations, and Administrator compliance review in one system.
 
+**[Open the live interactive preview](https://workforce.ajanihealthcare.com)**
+
 **Pre-production product · Synthetic preview data · Not deployed for live healthcare operations**
 
-Ajani Workforce is a genuine Ajani Healthcare product, currently in pre-production and intended for future operational use. Ajani Healthcare itself is a genuine operating business, but the workforce organisations, preview personas, and operational records shown inside this application are fictional and synthetic. The platform is not yet deployed in live healthcare operations and contains no real patient or workforce data. Its current pre-production release also serves as an engineering and product-design showcase.
+Ajani Workforce is a genuine Ajani Healthcare product, currently in pre-production and intended for future operational use. Ajani Healthcare itself is a genuine operating business, but the workforce organisations, preview personas, and operational records shown inside this application are fictional and synthetic. A public interactive preview is successfully deployed, using this synthetic preview data only — it remains pre-production and is not used for live healthcare operations, and contains no real patient or workforce data. This pre-production release also serves as an engineering and product-design showcase.
 
 ![Ajani Workforce landing page, showing the hero message "A calmer view of healthcare work" alongside a live shift and readiness summary card](docs/assets/screenshots/landing-desktop.png)
 
@@ -113,11 +115,11 @@ Every change is verified by `npm.cmd run verify` (lint, typecheck, unit tests, b
 
 | Suite | Coverage |
 | --- | --- |
-| Database | 38 tests — clean migration, seed, constraints, repository workflows |
-| Web | 62 tests — routes, API-driven state, interaction, accessibility |
+| Database | 56 tests — clean migration, seed, constraints, repository workflows, and PostgreSQL-mode configuration safety |
+| Web | 66 tests — routes, API-driven state, interaction, accessibility |
 | API | 77 tests — health and versioned preview endpoints |
 | Browser journeys and accessibility | 17 tests — Chromium journeys and axe gates across role routes |
-| PostgreSQL concurrency | 3 tests — real-PostgreSQL last-place contention, run separately in CI |
+| Real PostgreSQL integration | 7 tests — last-place contention concurrency (3) and hosted-preview migrate-reset-seed behaviour (4), run separately in CI |
 
 <details>
 <summary>Command reference</summary>
@@ -136,7 +138,7 @@ Every change is verified by `npm.cmd run verify` (lint, typecheck, unit tests, b
 | `npm.cmd run test:api` | Run health and versioned preview API tests. |
 | `npm.cmd run test:e2e` | Build and run isolated Chromium journeys and accessibility checks. |
 | `npm.cmd run test:e2e:accessibility` | Run only the representative axe and reduced-motion browser gate. |
-| `npm.cmd run test:postgres` | Run the separate PostgreSQL concurrency test when `AJANI_POSTGRES_TEST_URL` is available. |
+| `npm.cmd run test:postgres` | Run the separate real-PostgreSQL concurrency and hosted-preview reset tests when `AJANI_POSTGRES_TEST_URL` is available. |
 | `npm.cmd run build:web` | Type-check and build the Vite application. |
 | `npm.cmd run build:api` | Build contracts, database, and API workspaces. |
 | `npm.cmd run check:bundle` | Enforce production JavaScript entry, chunk, and total budgets. |
@@ -197,7 +199,7 @@ All preview responses carry a UUID request ID, generation timestamp, and `synthe
 - All mutations operate only on deterministic synthetic preview records; time-sensitive rules use a fixed injected instant rather than the real wall clock.
 - PGlite is a local preview and test engine, not a production-scale claim; public PGlite hosting must use one writer and an explicit writable data path.
 - CI runs three bounded concurrency tests against real PostgreSQL through the existing adapter — this does not establish production credentials, backups, monitoring, high availability, or complete external-database operations.
-- No deployment, customer usage, healthcare certification, or external integration is claimed.
+- A public pre-production preview is deployed at the URL above; this is not a live healthcare operation, and no customer usage, healthcare certification, or third-party healthcare integration is claimed.
 
 See [SECURITY.md](SECURITY.md) for the full reporting policy and preview boundaries.
 
@@ -207,7 +209,7 @@ See [SECURITY.md](SECURITY.md) for the full reporting policy and preview boundar
 - [Architecture decision records](docs/decisions/)
 - [Product and UX case study](docs/product/ux-case-study.md) and [design system](docs/product/design-system.md)
 - [Hosting-neutral delivery contract](docs/delivery/hosting-contract.md) and [operational runbook](docs/operations/runbook.md)
-- [Public preview deployment preparation](docs/delivery/public-preview-deployment.md) — configuration prepared for a Netlify (frontend), Render (API), and Neon (database) deployment of this preview; no successful, currently-serving deployment exists yet
+- [Public preview deployment and operations](docs/delivery/public-preview-deployment.md) — the verified Netlify (frontend), Render (API), and Neon (database) topology behind the deployed public preview, including provider configuration, startup and reset behaviour, and rollback guidance
 - [Contributor guide](CONTRIBUTING.md)
 
 ## Licence
