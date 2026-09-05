@@ -1,131 +1,68 @@
-import { healthResponseSchema, healthRoute } from '@ajani/contracts'
 import { CheckCircle2, RefreshCw, ServerOff, WifiOff } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  useServiceReadiness,
+  type ServiceReadinessState,
+} from '../hooks/useServiceReadiness'
 
-export type ServiceState = 'checking' | 'available' | 'unavailable' | 'offline'
+const startupMessages: Record<
+  ServiceReadinessState,
+  { readonly detail?: string; readonly headline: string }
+> = {
+  available: { headline: 'Service connected' },
+  connecting: { headline: 'Connecting to preview' },
+  delayed: {
+    detail: 'You can wait a little longer or try again now.',
+    headline: 'The preview service is taking longer than expected',
+  },
+  offline: {
+    detail: 'Some preview data may be unavailable. Try again when connected.',
+    headline: 'You appear to be offline',
+  },
+  starting: {
+    detail: 'The first connection can take up to a minute.',
+    headline: 'Starting preview service',
+  },
+}
 
-const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
-const recoveryDelayMilliseconds = 10_000
-
-async function checkService(signal: AbortSignal): Promise<void> {
-  const response = await fetch(`${apiBaseUrl}${healthRoute}`, {
-    headers: { accept: 'application/json' },
-    signal,
-  })
-
-  if (!response.ok) {
-    throw new Error('Health request failed')
+function StatusIcon({ state }: { readonly state: ServiceReadinessState }) {
+  if (state === 'offline') {
+    return <WifiOff size={17} />
   }
-
-  healthResponseSchema.parse(await response.json())
+  if (state === 'delayed') {
+    return <ServerOff size={17} />
+  }
+  if (state === 'available') {
+    return <CheckCircle2 size={17} />
+  }
+  // Reduced-motion viewers get this icon without its animation, so the headline and
+  // detail text below carry the progress on their own.
+  return <RefreshCw className="spin" size={17} />
 }
 
 export function ServiceStatus() {
-  const [attempt, setAttempt] = useState(0)
-  const [serviceState, setServiceState] = useState<ServiceState>(
-    navigator.onLine ? 'checking' : 'offline',
-  )
-  const previousState = useRef<ServiceState>(serviceState)
-  const [recovered, setRecovered] = useState(false)
-
-  const retryConnection = useCallback(() => {
-    if (!navigator.onLine) {
-      setServiceState('offline')
-      return
-    }
-
-    setServiceState('checking')
-    setAttempt((currentAttempt) => currentAttempt + 1)
-  }, [])
-
-  useEffect(() => {
-    function handleOffline(): void {
-      setServiceState('offline')
-    }
-
-    function handleOnline(): void {
-      retryConnection()
-    }
-
-    window.addEventListener('offline', handleOffline)
-    window.addEventListener('online', handleOnline)
-    return () => {
-      window.removeEventListener('offline', handleOffline)
-      window.removeEventListener('online', handleOnline)
-    }
-  }, [retryConnection])
-
-  useEffect(() => {
-    if (!navigator.onLine) {
-      return undefined
-    }
-
-    const controller = new AbortController()
-    let recoveryTimer: number | undefined
-
-    void checkService(controller.signal)
-      .then(() => {
-        if (
-          previousState.current === 'unavailable' ||
-          previousState.current === 'offline'
-        ) {
-          setRecovered(true)
-          window.setTimeout(() => { setRecovered(false); }, 4_000)
-        }
-        previousState.current = 'available'
-        setServiceState('available')
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return
-        }
-
-        previousState.current = 'unavailable'
-        setServiceState('unavailable')
-        recoveryTimer = window.setTimeout(() => {
-          setServiceState('checking')
-          setAttempt((currentAttempt) => currentAttempt + 1)
-        }, recoveryDelayMilliseconds)
-      })
-
-    return () => {
-      controller.abort()
-      if (recoveryTimer !== undefined) {
-        window.clearTimeout(recoveryTimer)
-      }
-    }
-  }, [attempt])
+  const { recovered, retry, state } = useServiceReadiness()
+  const { detail, headline } = startupMessages[state]
 
   return (
     <>
       <section
-        className={`network-status network-status--${serviceState}`}
+        className={`network-status network-status--${state}`}
         aria-label="Application service status"
       >
         <span className="network-status__icon" aria-hidden="true">
-          {serviceState === 'offline' ? (
-            <WifiOff size={17} />
-          ) : serviceState === 'unavailable' ? (
-            <ServerOff size={17} />
-          ) : serviceState === 'available' ? (
-            <CheckCircle2 size={17} />
-          ) : (
-            <RefreshCw className="spin" size={17} />
-          )}
+          <StatusIcon state={state} />
         </span>
+        {/*
+          One polite region for the whole status. Its text changes only when the
+          startup state itself changes, never per poll attempt, so repeated failures
+          while the service wakes do not re-announce the same message.
+        */}
         <div aria-live="polite">
-          <strong>
-            {serviceState === 'checking' && 'Checking service connection'}
-            {serviceState === 'available' && 'Service connected'}
-            {serviceState === 'unavailable' && 'Service temporarily unavailable'}
-            {serviceState === 'offline' && 'You appear to be offline'}
-          </strong>
-          {(serviceState === 'unavailable' || serviceState === 'offline') && (
-            <span>Some preview data may be unavailable. Try again when connected.</span>
-          )}
+          <strong>{headline}</strong>
+          {detail !== undefined && <span>{detail}</span>}
         </div>
-        {serviceState === 'unavailable' && (
-          <button className="text-button" onClick={retryConnection} type="button">
+        {state === 'delayed' && (
+          <button className="text-button" onClick={retry} type="button">
             Retry now
           </button>
         )}

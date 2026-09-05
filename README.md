@@ -110,7 +110,7 @@ Every change is verified by `npm.cmd run verify` (lint, typecheck, unit tests, b
 | Suite | Coverage |
 | --- | --- |
 | Database | 56 tests — clean migration, seed, constraints, repository workflows, and PostgreSQL-mode configuration safety |
-| Web | 66 tests — routes, API-driven state, interaction, accessibility |
+| Web | 86 tests — routes, API-driven state, interaction, accessibility |
 | API | 77 tests — health and versioned preview endpoints |
 | Browser journeys and accessibility | 17 tests — Chromium journeys and axe gates across role routes |
 | Real PostgreSQL integration | 7 tests — last-place contention concurrency (3) and hosted-preview migrate-reset-seed behaviour (4), run separately in CI |

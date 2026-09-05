@@ -17,7 +17,6 @@ import { Link } from 'react-router-dom'
 import { BrandMark } from '../components/BrandMark'
 import { Badge } from '../components/ui/Badge'
 import { Dialog } from '../components/ui/Dialog'
-import { useApiWakeUp } from '../hooks/useApiWakeUp'
 import { useRouteDocumentTitle } from '../hooks/useDocumentTitle'
 import { roleDefinitions, roleNavigation, type RoleId } from '../types/navigation'
 
@@ -341,7 +340,6 @@ function LandingFooter() {
 
 export function LandingPage() {
   useRouteDocumentTitle()
-  useApiWakeUp()
 
   return (
     <div className="landing">
