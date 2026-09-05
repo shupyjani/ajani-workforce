@@ -1,20 +1,14 @@
 # Ajani Workforce
 
-A pre-production healthcare-workforce platform from Ajani Healthcare, connecting Worker shift and timesheet journeys, Manager operations, and Administrator compliance review in one system.
+A full-stack healthcare workforce platform connecting shift coordination, timesheets, operational oversight and compliance workflows across Worker, Manager and Administrator journeys.
 
-**[Open the live interactive preview](https://workforce.ajanihealthcare.com)**
-
-**Pre-production product · Synthetic preview data · Not deployed for live healthcare operations**
-
-Ajani Workforce is a genuine Ajani Healthcare product, currently in pre-production and intended for future operational use. Ajani Healthcare itself is a genuine operating business, but the workforce organisations, preview personas, and operational records shown inside this application are fictional and synthetic. A public interactive preview is successfully deployed, using this synthetic preview data only — it remains pre-production and is not used for live healthcare operations, and contains no real patient or workforce data. This pre-production release also serves as an engineering and product-design showcase.
+**[Explore the live interactive preview](https://workforce.ajanihealthcare.com)**
 
 ![Ajani Workforce landing page, showing the hero message "A calmer view of healthcare work" alongside a live shift and readiness summary card](docs/assets/screenshots/landing-desktop.png)
 
 ## What it does
 
-Ajani Workforce connects shift discovery, assignment decisions, compliance readiness, and timesheet activity through a relational PostgreSQL model, deterministic synthetic data, versioned APIs, and a responsive React interface. A Worker requesting a shift, a Manager approving it, and an Administrator confirming the Worker's compliance readiness all read and write the same coherent, transactionally-consistent state — reflected live across every connected view.
-
-Authentication and authorization are not implemented. Role selection changes only the displayed synthetic persona and is not a security boundary.
+Ajani Workforce connects shift discovery, assignment decisions, compliance readiness, and timesheet activity through a relational PostgreSQL model, deterministic preview data, versioned APIs, and a responsive React interface. A Worker requesting a shift, a Manager approving it, and an Administrator confirming the Worker's compliance readiness all read and write the same coherent, transactionally-consistent state — reflected live across every connected view.
 
 ## Three connected role journeys
 
@@ -22,7 +16,7 @@ Authentication and authorization are not implemented. Role selection changes onl
 
 Workers discover eligible shifts with location and availability filters, request and cancel assignments, track readiness against compliance requirements, and draft, submit, correct, and resubmit timesheets.
 
-![Worker overview page for the synthetic persona Leila Mensah, showing her next confirmed shift, upcoming schedule, and a 3-of-4 work-readiness summary](docs/assets/screenshots/worker-overview-desktop.png)
+![Worker overview page for demo persona Leila Mensah, showing her next confirmed shift, upcoming schedule, and a 3-of-4 work-readiness summary](docs/assets/screenshots/worker-overview-desktop.png)
 
 ### Manager
 
@@ -34,7 +28,7 @@ Managers review assignment requests against live capacity and readiness, author 
 
 Administrators review compliance evidence, decide outstanding records, and see how each decision recalculates the Worker's effective readiness — the same readiness value Workers and Managers act on.
 
-![Administrator compliance review page showing a synthetic readiness register filtered by status, with counts for current, reviewing, and action-due records](docs/assets/screenshots/administrator-compliance-desktop.png)
+![Administrator compliance review page showing a readiness register filtered by status, with counts for current, reviewing, and action-due records](docs/assets/screenshots/administrator-compliance-desktop.png)
 
 The interface reflows for touch and narrow screens without hiding meaning or overflowing horizontally:
 
@@ -102,7 +96,7 @@ npm.cmd ci
 npm.cmd run dev
 ```
 
-`pglite` is the default data mode — no environment file is required. On first API startup, all reviewed migrations are applied and a deterministic synthetic preview seed is inserted into the ignored `.ajani-data/pglite` directory. The web application runs at `http://127.0.0.1:5173`, the API at `http://127.0.0.1:3000`, and Vite proxies `/api`, `/health`, `/live`, and `/ready` to Fastify.
+`pglite` is the default data mode — no environment file is required. On first API startup, all reviewed migrations are applied and a deterministic preview seed is inserted into the ignored `.ajani-data/pglite` directory. The web application runs at `http://127.0.0.1:5173`, the API at `http://127.0.0.1:3000`, and Vite proxies `/api`, `/health`, `/live`, and `/ready` to Fastify.
 
 | Mode | Configuration | Behaviour |
 | --- | --- | --- |
@@ -128,7 +122,7 @@ Every change is verified by `npm.cmd run verify` (lint, typecheck, unit tests, b
 | --- | --- |
 | `npm.cmd run dev` | Start the complete web and API preview. |
 | `npm.cmd run db:migrate` | Build the database workspace and apply reviewed migrations. |
-| `npm.cmd run db:seed` | Apply migrations and idempotently insert synthetic preview data. |
+| `npm.cmd run db:seed` | Apply migrations and idempotently insert preview data. |
 | `npm.cmd run db:reset:preview` | Reset only known preview rows; PGlite only. |
 | `npm.cmd run db:verify` | Apply a clean temporary migration, seed twice, reset, and compare deterministic snapshots. |
 | `npm.cmd run lint` | Run type-aware repository linting. |
@@ -188,18 +182,16 @@ All preview responses carry a UUID request ID, generation timestamp, and `synthe
 | `GET /api/v1/preview/administrators/:administratorId/timesheets` | Read-only lifecycle oversight and summary counts. |
 | `GET /api/v1/preview/notifications?recipientId=<uuid>` | Cursor-paginated recipient notifications. |
 
-`/worker/shifts`, `/worker/schedule`, and `/worker/timesheets` expose the Worker journey; `/manager/requests`, `/manager/shifts`, and `/manager/timesheets` expose Manager operations; `/administrator/compliance`, `/administrator/records`, and `/administrator/timesheets` expose Administrator oversight. Successful mutations persist only synthetic data and are restored by `npm.cmd run db:reset:preview`.
+`/worker/shifts`, `/worker/schedule`, and `/worker/timesheets` expose the Worker journey; `/manager/requests`, `/manager/shifts`, and `/manager/timesheets` expose Manager operations; `/administrator/compliance`, `/administrator/records`, and `/administrator/timesheets` expose Administrator oversight. Successful mutations persist only preview data and are restored by `npm.cmd run db:reset:preview`.
 
 </details>
 
-## Security and intentional limitations
+## Current scope
 
-- Authentication, authorization, account provisioning, and real access decisions are not included in this pre-production preview; persona selection is a preview only, not a security boundary.
-- Document upload, evidence-file storage, payroll, invoicing, expenses, tax, messaging, and production notifications are not implemented.
-- All mutations operate only on deterministic synthetic preview records; time-sensitive rules use a fixed injected instant rather than the real wall clock.
-- PGlite is a local preview and test engine, not a production-scale claim; public PGlite hosting must use one writer and an explicit writable data path.
-- CI runs three bounded concurrency tests against real PostgreSQL through the existing adapter — this does not establish production credentials, backups, monitoring, high availability, or complete external-database operations.
-- A public pre-production preview is deployed at the URL above; this is not a live healthcare operation, and no customer usage, healthcare certification, or third-party healthcare integration is claimed.
+- The public preview runs on generated demo records and is not connected to real workforce or patient information.
+- Role selection exists so each journey can be explored end to end; authentication, authorisation, and account provisioning are not implemented.
+- Document and evidence-file storage, payroll, invoicing, expenses, tax, messaging, and production notifications sit outside the current release.
+- PostgreSQL tests cover selected transactional and concurrency scenarios; production operations such as backups, monitoring, high availability, and external integrations remain future work.
 
 See [SECURITY.md](SECURITY.md) for the full reporting policy and preview boundaries.
 
