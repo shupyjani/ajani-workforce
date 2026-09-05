@@ -18,6 +18,7 @@ import { createAjaniQueryClient } from './api/queryClient'
 import { AppShell } from './components/AppShell'
 import { NotificationSessionProvider } from './context/NotificationSessionContext'
 import { RolePreviewProvider } from './context/RolePreviewContext'
+import { useApiWakeUp } from './hooks/useApiWakeUp'
 import type { RoleId } from './types/navigation'
 import {
   AdministratorRecordsPage,
@@ -283,6 +284,10 @@ function roleFromPath(path: string): RoleId {
 }
 
 function App({ initialEntries }: AppProps) {
+  // Mounted here, above the router, so the sleeping preview API starts waking on
+  // every browser entry point — the landing page, each role workspace, and any
+  // direct or deep-link entry — rather than only when the landing page is opened.
+  useApiWakeUp()
   const initialPath = initialEntries?.[0] ?? window.location.pathname
   const [queryClient] = useState(createAjaniQueryClient)
   const [router] = useState(() =>

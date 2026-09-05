@@ -304,6 +304,14 @@ export function previewApiResponse(input: RequestInfo | URL, init?: RequestInit)
       timestamp: generatedAt,
     })
   }
+  if (path === '/ready') {
+    return jsonResponse({
+      requestId,
+      service: 'ajani-workforce-api',
+      status: 'ready',
+      timestamp: generatedAt,
+    })
+  }
   if (path.endsWith('/overview')) {
     return jsonResponse(
       envelope({

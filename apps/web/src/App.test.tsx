@@ -1,7 +1,9 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { readinessRoute } from '@ajani/contracts'
 import App from './App'
+import { readinessPollIntervalMilliseconds } from './hooks/useServiceReadiness'
 import {
   installPreviewApiMock,
   previewApiResponse,
@@ -416,27 +418,37 @@ describe('Ajani application shell', () => {
   })
 
   it('recovers from an unavailable API without logging an expected network error', async () => {
-    let healthAttempts = 0
+    vi.useFakeTimers()
+    let readinessAttempts = 0
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation((input) => {
-      if (previewRequestUrl(input).pathname === '/health') {
-        healthAttempts += 1
-        if (healthAttempts === 1) {
+      if (previewRequestUrl(input).pathname === readinessRoute) {
+        readinessAttempts += 1
+        if (readinessAttempts === 1) {
           return Promise.reject(new TypeError('Failed to fetch'))
         }
       }
       return Promise.resolve(previewApiResponse(input))
     })
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
-    const user = userEvent.setup()
     render(<App initialEntries={['/worker/overview']} />)
 
-    expect(await screen.findByText(/service temporarily unavailable/i)).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: /retry now/i }))
+    // The first readiness attempt fails, so the wait is explained rather than left
+    // on the opening message.
+    await vi.waitFor(() => {
+      expect(screen.getByText(/starting preview service/i)).toBeInTheDocument()
+    })
+    expect(readinessAttempts).toBe(1)
 
-    expect(await screen.findByText(/service connected/i)).toBeInTheDocument()
+    // The bounded poll recovers on its own, with no visitor action.
+    await vi.advanceTimersByTimeAsync(readinessPollIntervalMilliseconds)
+
+    await vi.waitFor(() => {
+      expect(screen.getByText(/service connected/i)).toBeInTheDocument()
+    })
     expect(screen.getByRole('status')).toHaveTextContent(/connection restored/i)
-    expect(healthAttempts).toBe(2)
+    expect(readinessAttempts).toBe(2)
     expect(fetchMock).toHaveBeenCalled()
     expect(consoleError).not.toHaveBeenCalled()
+    vi.useRealTimers()
   })
 })

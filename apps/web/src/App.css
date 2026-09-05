@@ -343,7 +343,7 @@
   background: var(--color-success-soft);
 }
 
-.network-status--unavailable { color: var(--color-warning); background: var(--color-warning-soft); }
+.network-status--delayed { color: var(--color-warning); background: var(--color-warning-soft); }
 .network-status--offline { color: var(--color-danger); background: var(--color-danger-soft); }
 
 .network-status > div {
