@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BrandMark } from '../components/BrandMark'
+import { AJANI_HEALTHCARE_WEBSITE, BrandMark } from '../components/BrandMark'
 import { Badge } from '../components/ui/Badge'
 import { Dialog } from '../components/ui/Dialog'
 import { useRouteDocumentTitle } from '../hooks/useDocumentTitle'
@@ -32,6 +32,7 @@ const primaryNavLinks = [
   { href: '#product', label: 'Product' },
   { href: '#roles', label: 'Roles' },
   { href: '#capabilities', label: 'Capabilities' },
+  { href: AJANI_HEALTHCARE_WEBSITE, label: 'Ajani Healthcare' },
 ] as const
 
 const capabilityAreas = [

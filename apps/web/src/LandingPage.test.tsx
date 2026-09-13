@@ -39,6 +39,17 @@ describe('Ajani Workforce landing page', () => {
     expect(screen.getByRole('main')).toBeInTheDocument()
     expect(screen.getByRole('contentinfo')).toBeInTheDocument()
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
+    expect(screen.getByRole('link', { name: /^ajani healthcare$/i })).toHaveAttribute(
+      'href',
+      'https://www.ajanihealthcare.com/',
+    )
+
+    const headerMark = screen
+      .getByRole('link', { name: /ajani workforce home/i })
+      .querySelector('.brand-mark')
+    expect(headerMark?.querySelector('rect')).toHaveAttribute('fill', '#0B5351')
+    expect(headerMark?.querySelector('path')).toHaveAttribute('fill', '#FAF8F1')
+    expect(headerMark?.querySelector('circle')).toHaveAttribute('fill', '#D2AA56')
   })
 
   it('links every role journey and the closing call to action to their real routes', () => {
@@ -110,6 +121,10 @@ describe('Ajani Workforce landing page', () => {
     expect(within(menu).getByRole('link', { name: /^product$/i })).toBeInTheDocument()
     expect(within(menu).getByRole('link', { name: /^roles$/i })).toBeInTheDocument()
     expect(within(menu).getByRole('link', { name: /^capabilities$/i })).toBeInTheDocument()
+    expect(within(menu).getByRole('link', { name: /^ajani healthcare$/i })).toHaveAttribute(
+      'href',
+      'https://www.ajanihealthcare.com/',
+    )
     await waitFor(() => {
       expect(within(menu).getByRole('button', { name: /close menu/i })).toHaveFocus()
     })

@@ -1,6 +1,7 @@
 import {
   Bell,
   BookOpen,
+  Building2,
   Check,
   ChevronDown,
   Menu,
@@ -28,7 +29,7 @@ import {
   type NavigationItem,
   type RoleId,
 } from '../types/navigation'
-import { BrandMark } from './BrandMark'
+import { AJANI_HEALTHCARE_WEBSITE, BrandMark } from './BrandMark'
 import { NotificationList } from './NotificationList'
 import { PreviewDataSource, PreviewQueryBoundary } from './PreviewQueryBoundary'
 import { ServiceStatus } from './ServiceStatus'
@@ -146,6 +147,18 @@ function ProductNavigation({ onNavigate }: { readonly onNavigate?: () => void })
       {roleNavigation[role].map(renderItem)}
       <p className="product-nav__label product-nav__label--secondary">About</p>
       {sharedNavigation.map(renderItem)}
+      <a
+        aria-label="Ajani Healthcare company website"
+        className="product-nav__link"
+        href={AJANI_HEALTHCARE_WEBSITE}
+        onClick={onNavigate}
+      >
+        <Building2 aria-hidden="true" size={20} strokeWidth={1.8} />
+        <span>
+          <strong>Ajani Healthcare</strong>
+          <small>Company website</small>
+        </span>
+      </a>
     </nav>
   )
 }
