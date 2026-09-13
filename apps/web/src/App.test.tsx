@@ -62,6 +62,12 @@ describe('Ajani application shell', () => {
     expect(
       screen.getByRole('navigation', { name: /worker preview navigation/i }),
     ).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('navigation', { name: /worker preview navigation/i })).getByRole(
+        'link',
+        { name: /ajani healthcare company website/i },
+      ),
+    ).toHaveAttribute('href', 'https://www.ajanihealthcare.com/')
 
     await user.tab()
 

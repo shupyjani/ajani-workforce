@@ -63,7 +63,6 @@
   width: 2.45rem;
   height: 2.45rem;
   flex: 0 0 auto;
-  color: #eff5f2;
 }
 
 .brand__name {
@@ -968,7 +967,6 @@ tbody th { color: var(--color-ink-strong); font-weight: 720; }
 }
 
 .landing-header .brand__name { color: var(--color-white); }
-.landing-header .brand-mark { color: #eff5f2; }
 
 .landing-header__nav { display: flex; gap: var(--space-6); }
 .landing-header__nav a { color: #a8bfba; font-size: var(--text-sm); font-weight: 700; text-decoration: none; }
@@ -1068,7 +1066,6 @@ tbody th { color: var(--color-ink-strong); font-weight: 720; }
 .landing-footer { display: flex; gap: var(--space-4); align-items: center; justify-content: space-between; flex-wrap: wrap; padding: clamp(1.5rem, 3vw, 2.2rem) clamp(1.2rem, 4vw, 3.5rem); border-top: 1px solid var(--color-border); background: var(--color-surface-subtle); }
 .landing-footer .brand__name { color: var(--color-ink-strong); }
 .landing-footer .brand__name small { color: var(--color-ink-muted); }
-.landing-footer .brand-mark { color: var(--color-surface-inverse); }
 .landing-footer__meta { display: flex; gap: 1.1rem; flex-wrap: wrap; color: var(--color-ink-muted); font-size: 0.7rem; }
 .landing-footer__meta p { margin: 0; }
 
